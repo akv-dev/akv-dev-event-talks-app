@@ -10,8 +10,16 @@ _BLUE='\033[0;34m'
 _GREEN='\033[0;32m'
 _NC='\033[0m' # No Color
 
-printf "${_BLUE}Starting the database...${_NC}\n"
-podman run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 docker.io/pgvector/pgvector:pg17-trixie
+printf "${_BLUE}Starting the database...${_NC}\
+"
+if podman container exists postgres; then
+    printf "Postgres container already exists. Starting it if it's stopped.\n"
+    podman start postgres
+else
+    printf "Postgres container not found. Creating and starting a new one.\n"
+    podman run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 docker.io/pgvector/pgvector:pg17-trixie
+fi
+
 
 # 2. Wait for the database to be ready
 printf "${_BLUE}Waiting for the database to be ready...${_NC}\n"
