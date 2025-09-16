@@ -11,7 +11,7 @@ _GREEN='\033[0;32m'
 _NC='\033[0m' # No Color
 
 printf "${_BLUE}Starting the database...${_NC}\n"
-podman run -d --name postgres -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_PASSWORD=postgres -e POSTGRESQL_DATABASE=postgres -p 5432:5432 docker.io/bitnami/postgresql:latest
+podman run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 docker.io/pgvector/pgvector:pg17-trixie
 
 # 2. Wait for the database to be ready
 printf "${_BLUE}Waiting for the database to be ready...${_NC}\n"
@@ -19,7 +19,8 @@ sleep 10
 
 # 3. Populate the database
 printf "${_BLUE}Populating the database...${_NC}\n"
-cat <<EOF | podman exec -i postgres psql -U postgres
+export PGPASSWORD=postgres
+cat <<EOF | podman exec -i postgres psql -U postgres -h localhost
 CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE embeddings (
@@ -36,6 +37,7 @@ INSERT INTO embeddings (text, embedding) VALUES
   ('strawberry', '[1, 1, 1]'),
   ('pineapple', '[1, 1, 2]');
 EOF
+unset PGPASSWORD
 
 # 4. Install backend dependencies
 printf "${_BLUE}Installing backend dependencies...${_NC}\n"
