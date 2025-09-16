@@ -9,6 +9,8 @@ This project allows you to visualize vector embeddings from a PostgreSQL databas
 *   **Vector Details:** Click on a node to see the text and embedding of the vector.
 *   **Search:** Use the search bar to find and highlight specific nodes.
 *   **Distance Metric:** Use the dropdown menu to switch between different distance metrics (Euclidean, Cosine, and Inner Product).
+*   **Interactive Database Viewer:** Explore your database tables, view their schemas, and inspect the raw data.
+*   **Embedding Visualization:** Visualize high-dimensional vector embeddings in a 2D scatter plot.
 
 ## Getting Started
 
