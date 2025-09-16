@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { getGraphData } = require('./db');
+const { getSearchBasedGraphData } = require('./db');
 
 const app = express();
 const port = 3001;
@@ -11,13 +11,13 @@ app.use(cors());
 const interactiveRouter = require('./interactive');
 app.use('/api', interactiveRouter);
 
-app.get('/api/vectors', async (req, res) => {
+app.get('/api/search-vectors', async (req, res) => {
   try {
-    const { metric, vectorColumn } = req.query;
-    const graphData = await getGraphData(metric, vectorColumn);
+    const { query, vectorColumn, metric, limit } = req.query;
+    const graphData = await getSearchBasedGraphData(query, vectorColumn, metric, limit);
     res.json(graphData);
   } catch (err) {
-    console.error('Error fetching graph data:', err);
+    console.error('Error fetching search-based graph data:', err);
     res.status(500).json({ error: 'Failed to fetch graph data' });
   }
 });

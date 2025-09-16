@@ -1,37 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import Graph from './Graph';
 import DBViewer from './components/DBViewer';
 
 function App() {
   const [data, setData] = useState({ nodes: [], links: [] });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [metric, setMetric] = useState('euclidean');
   const [vectorColumn, setVectorColumn] = useState('content_vector');
   const [view, setView] = useState('graph');
 
-  useEffect(() => {
-    if (view === 'graph') {
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get(`http://localhost:3001/api/vectors?metric=${metric}&vectorColumn=${vectorColumn}`);
-          setData(response.data);
-        } catch (error) {
-          console.error('Error fetching data: ', error);
-          setError('Failed to fetch data. Please make sure the backend server is running.');
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchData();
+  const handleSearch = async () => {
+    if (!searchTerm) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`http://localhost:3001/api/search-vectors?query=${searchTerm}&metric=${metric}&vectorColumn=${vectorColumn}`);
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+      setError('Failed to fetch data. Please make sure the backend server is running.');
+    } finally {
+      setLoading(false);
     }
-  }, [metric, vectorColumn, view]);
+  };
 
-  const handleSearchChange = (event) => {
+  const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
@@ -47,20 +43,6 @@ function App() {
     setView(view === 'graph' ? 'db' : 'graph');
   }
 
-  const filteredNodes = data.nodes.filter(node =>
-    node.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredLinks = data.links.filter(link => {
-    const sourceNode = data.nodes.find(node => node.id === link.source);
-    const targetNode = data.nodes.find(node => node.id === link.target);
-    return sourceNode && targetNode &&
-           (sourceNode.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            targetNode.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  });
-
-  const graphData = searchTerm ? { nodes: filteredNodes, links: filteredLinks } : data;
-
   return (
     <div className="App">
       <button onClick={toggleView}>
@@ -72,12 +54,15 @@ function App() {
           <p>
             This tool visualizes vector embeddings from a database. The graph view shows the relationships between different data points based on their vector similarity. The DB viewer allows you to explore the raw data and visualize high-dimensional vector embeddings in a 2D space using Principal Component Analysis (PCA).
           </p>
-          <input
-            type="text"
-            placeholder="Search nodes..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Search for an article title..."
+              value={searchTerm}
+              onChange={handleSearchTermChange}
+            />
+            <button onClick={handleSearch}>Search</button>
+          </div>
           <select onChange={handleMetricChange} value={metric}>
             <option value="euclidean">Euclidean</option>
             <option value="cosine">Cosine</option>
@@ -89,7 +74,7 @@ function App() {
           </select>
           {loading && <p>Loading...</p>}
           {error && <p style={{ color: 'red' }}>{error}</p>}
-          {!loading && !error && <Graph data={graphData} searchTerm={searchTerm} />}
+          {!loading && !error && <Graph data={data} searchTerm={searchTerm} />}
         </div>
       ) : (
         <DBViewer />
