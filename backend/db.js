@@ -61,4 +61,7 @@ async function getGraphData(metric = 'euclidean') {
   return { nodes, links };
 }
 
-module.exports = { getGraphData };
+module.exports = {
+  getGraphData,
+  query: (text, params) => pool.query(text, params),
+};
