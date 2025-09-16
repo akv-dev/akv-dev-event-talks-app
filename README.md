@@ -20,7 +20,17 @@ These instructions will get you a copy of the project up and running on your loc
 *   [Podman](https://podman.io/)
 *   [Podman Compose](https://github.com/containers/podman-compose)
 
-### Installation
+### Easy Setup with `gini.sh`
+
+This project includes a `gini.sh` script that automates the entire setup process. Just run the following command:
+
+```bash
+./gini.sh
+```
+
+### Manual Installation
+
+If you prefer to set up the project manually, follow these steps:
 
 1.  **Clone the repository:**
     ```bash
@@ -29,14 +39,12 @@ These instructions will get you a copy of the project up and running on your loc
     ```
 
 2.  **Start the database:**
-    This project uses Podman to run a PostgreSQL database with the `pgvector` extension.
     ```bash
     podman-compose up -d db
     ```
 
 3.  **Populate the database:**
-    Connect to the database using a PostgreSQL client. The credentials are in the `docker-compose.yml` file (user: `postgres`, password: `postgres`, database: `postgres`, host: `localhost`, port: `5432`).
-    Once connected, run the following SQL commands:
+    Connect to the database using a PostgreSQL client (e.g., `psql` or a GUI tool). The credentials are in the `docker-compose.yml` file.
     ```sql
     CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -55,40 +63,20 @@ These instructions will get you a copy of the project up and running on your loc
       ('pineapple', '[1, 1, 2]');
     ```
 
-4.  **Install backend dependencies:**
+4.  **Set up and start the backend:**
     ```bash
     cd backend
     npm install
+    # Create a .env file with the database credentials (see .env.example)
+    node server.js &
     ```
 
-5.  **Set up backend environment variables:**
-    Create a `.env` file in the `backend` directory with your PostgreSQL connection details:
-    ```
-    DB_USER=postgres
-    DB_HOST=localhost
-    DB_DATABASE=postgres
-    DB_PASSWORD=postgres
-    DB_PORT=5432
-    ```
-
-6.  **Start the backend server:**
-    ```bash
-    node server.js
-    ```
-    The server will be running on `http://localhost:3001`.
-
-7.  **Install frontend dependencies:**
-    In a new terminal, navigate to the `frontend` directory:
+5.  **Set up and start the frontend:**
     ```bash
     cd ../frontend
     npm install
-    ```
-
-8.  **Start the frontend application:**
-    ```bash
     npm start
     ```
-    The application will open in your browser at `http://localhost:3000`.
 
 ## How it works
 
