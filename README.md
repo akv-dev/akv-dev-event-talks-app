@@ -2,21 +2,41 @@
 
 This project allows you to visualize vector embeddings from a PostgreSQL database. It consists of a Node.js backend and a React frontend.
 
-## Setup
+## Features
 
-### 1. Database Setup
+*   **Interactive Graph:** Visualizes vector embeddings as a force-directed graph.
+*   **Distance on Hover:** Hover over the links between the nodes to see the distance between them.
+*   **Vector Details:** Click on a node to see the text and embedding of the vector.
+*   **Search:** Use the search bar to find and highlight specific nodes.
+*   **Distance Metric:** Use the dropdown menu to switch between different distance metrics (Euclidean, Cosine, and Inner Product).
 
-This project uses Docker to run a PostgreSQL database with the `pgvector` extension. 
+## Getting Started
 
-1.  **Start the database container:**
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+*   [Node.js](https://nodejs.org/)
+*   [Podman](https://podman.io/)
+*   [Podman Compose](https://github.com/containers/podman-compose)
+
+### Installation
+
+1.  **Clone the repository:**
     ```bash
-    docker-compose up -d db
+    git clone https://github.com/akv-dev/akv-dev-event-talks-app.git
+    cd akv-dev-event-talks-app
     ```
 
-2.  **Connect to the database and create the table:**
-    You can connect to the database using any PostgreSQL client. The credentials are in the `docker-compose.yml` file.
-    Once connected, run the following SQL commands:
+2.  **Start the database:**
+    This project uses Podman to run a PostgreSQL database with the `pgvector` extension.
+    ```bash
+    podman-compose up -d db
+    ```
 
+3.  **Populate the database:**
+    Connect to the database using a PostgreSQL client. The credentials are in the `docker-compose.yml` file (user: `postgres`, password: `postgres`, database: `postgres`, host: `localhost`, port: `5432`).
+    Once connected, run the following SQL commands:
     ```sql
     CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -35,19 +55,14 @@ This project uses Docker to run a PostgreSQL database with the `pgvector` extens
       ('pineapple', '[1, 1, 2]');
     ```
 
-### 2. Backend Setup
-
-1.  **Navigate to the backend directory:**
+4.  **Install backend dependencies:**
     ```bash
     cd backend
-    ```
-
-2.  **Install dependencies:**
-    ```bash
     npm install
     ```
 
-3.  **Set up environment variables:** Create a `.env` file in the `backend` directory with your PostgreSQL connection details:
+5.  **Set up backend environment variables:**
+    Create a `.env` file in the `backend` directory with your PostgreSQL connection details:
     ```
     DB_USER=postgres
     DB_HOST=localhost
@@ -56,25 +71,20 @@ This project uses Docker to run a PostgreSQL database with the `pgvector` extens
     DB_PORT=5432
     ```
 
-4.  **Start the backend server:**
+6.  **Start the backend server:**
     ```bash
     node server.js
     ```
     The server will be running on `http://localhost:3001`.
 
-### 3. Frontend Setup
-
-1.  **Navigate to the frontend directory:**
+7.  **Install frontend dependencies:**
+    In a new terminal, navigate to the `frontend` directory:
     ```bash
-    cd frontend
-    ```
-
-2.  **Install dependencies:**
-    ```bash
+    cd ../frontend
     npm install
     ```
 
-3.  **Start the frontend development server:**
+8.  **Start the frontend application:**
     ```bash
     npm start
     ```
