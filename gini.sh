@@ -10,14 +10,25 @@ _BLUE='\033[0;34m'
 _GREEN='\033[0;32m'
 _NC='\033[0m' # No Color
 
-printf "${_BLUE}Starting the database...${_NC}\
-"
-if podman container exists postgres; then
+printf "${_BLUE}Starting the database...${_NC}"
+
+if command -v podman &> /dev/null; then
+    CONTAINER_CMD="podman"
+elif command -v docker &> /dev/null; then
+    CONTAINER_CMD="docker"
+else
+    printf "Error: Neither podman nor docker found. Please install one of them.\n"
+    exit 1
+fi
+
+printf "Using ${CONTAINER_CMD}...\n"
+
+if ${CONTAINER_CMD} inspect postgres > /dev/null 2>&1; then
     printf "Postgres container already exists. Starting it if it's stopped.\n"
-    podman start postgres
+    ${CONTAINER_CMD} start postgres
 else
     printf "Postgres container not found. Creating and starting a new one.\n"
-    podman run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 docker.io/pgvector/pgvector:pg17-trixie
+    ${CONTAINER_CMD} run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 docker.io/pgvector/pgvector:pg17-trixie
 fi
 
 
@@ -28,7 +39,7 @@ sleep 10
 # 3. Populate the database
 printf "${_BLUE}Populating the database...${_NC}\n"
 export PGPASSWORD=postgres
-cat <<EOF | podman exec -i postgres psql -U postgres -h localhost
+cat <<EOF | ${CONTAINER_CMD} exec -i postgres psql -U postgres -h localhost
 CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE embeddings (
