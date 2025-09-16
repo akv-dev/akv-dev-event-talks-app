@@ -9,6 +9,7 @@ function App() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [metric, setMetric] = useState('euclidean');
+  const [vectorColumn, setVectorColumn] = useState('content_vector');
   const [view, setView] = useState('graph');
 
   useEffect(() => {
@@ -16,7 +17,7 @@ function App() {
       const fetchData = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`http://localhost:3001/api/vectors?metric=${metric}`);
+          const response = await axios.get(`http://localhost:3001/api/vectors?metric=${metric}&vectorColumn=${vectorColumn}`);
           setData(response.data);
         } catch (error) {
           console.error('Error fetching data: ', error);
@@ -28,7 +29,7 @@ function App() {
 
       fetchData();
     }
-  }, [metric, view]);
+  }, [metric, vectorColumn, view]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -36,6 +37,10 @@ function App() {
 
   const handleMetricChange = (event) => {
     setMetric(event.target.value);
+  };
+
+  const handleVectorColumnChange = (event) => {
+    setVectorColumn(event.target.value);
   };
 
   const toggleView = () => {
@@ -77,6 +82,10 @@ function App() {
             <option value="euclidean">Euclidean</option>
             <option value="cosine">Cosine</option>
             <option value="inner_product">Inner Product</option>
+          </select>
+          <select onChange={handleVectorColumnChange} value={vectorColumn}>
+            <option value="title_vector">Title Vector</option>
+            <option value="content_vector">Content Vector</option>
           </select>
           {loading && <p>Loading...</p>}
           {error && <p style={{ color: 'red' }}>{error}</p>}

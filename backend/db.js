@@ -14,22 +14,26 @@ const distanceOperators = {
   inner_product: '<#>',
 };
 
-async function getGraphData(metric = 'euclidean') {
+async function getGraphData(metric = 'euclidean', vectorColumn = 'content_vector') {
   const operator = distanceOperators[metric] || distanceOperators.euclidean;
+  const allowedColumns = ['title_vector', 'content_vector'];
+  if (!allowedColumns.includes(vectorColumn)) {
+    throw new Error(`Invalid vector column name: ${vectorColumn}`);
+  }
 
   const query = `
     WITH distances AS (
       SELECT
         e1.id AS source_id,
-        e1.text AS source_text,
-        e1.embedding AS source_embedding,
+        e1.title AS source_text,
+        e1."${vectorColumn}" AS source_embedding,
         e2.id AS target_id,
-        e1.embedding ${operator} e2.embedding AS distance,
-        ROW_NUMBER() OVER(PARTITION BY e1.id ORDER BY e1.embedding ${operator} e2.embedding) as rn
+        e1."${vectorColumn}" ${operator} e2."${vectorColumn}" AS distance,
+        ROW_NUMBER() OVER(PARTITION BY e1.id ORDER BY e1."${vectorColumn}" ${operator} e2."${vectorColumn}") as rn
       FROM
-        embeddings e1
+        articles e1
       CROSS JOIN
-        embeddings e2
+        articles e2
       WHERE
         e1.id != e2.id
     )

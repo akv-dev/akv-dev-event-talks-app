@@ -13,8 +13,8 @@ app.use('/api', interactiveRouter);
 
 app.get('/api/vectors', async (req, res) => {
   try {
-    const { metric } = req.query;
-    const graphData = await getGraphData(metric);
+    const { metric, vectorColumn } = req.query;
+    const graphData = await getGraphData(metric, vectorColumn);
     res.json(graphData);
   } catch (err) {
     console.error('Error fetching graph data:', err);
