@@ -11,7 +11,15 @@ const DBViewer = () => {
   useEffect(() => {
     fetch('http://localhost:3001/api/tables')
       .then(res => res.json())
-      .then(data => setTables(data))
+      .then(data => {
+        console.log('Fetched tables:', data);
+        if (Array.isArray(data)) {
+          setTables(data);
+        } else {
+          console.error('Error: Fetched data is not an array.');
+          setTables([]); // Set to empty array to prevent crash
+        }
+      })
       .catch(err => console.error('Error fetching tables:', err));
   }, []);
 
