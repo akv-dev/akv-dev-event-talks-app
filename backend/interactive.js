@@ -6,47 +6,43 @@ const { PCA } = require('pca-js');
 router.get('/tables', async (req, res) => {
   try {
     const result = await db.query(`
-      SELECT table_name
+      SELECT table_schema, table_name
       FROM information_schema.tables
-      WHERE table_schema = 'public'
+      WHERE table_schema != 'pg_catalog' AND table_schema != 'information_schema'
     `);
-    res.json(result.rows.map(row => row.table_name));
+    res.json(result.rows.map(row => ({ schema: row.table_schema, name: row.table_name })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-router.get('/tables/:tableName/schema', async (req, res) => {
+router.get('/table-details', async (req, res) => {
   try {
-    const { tableName } = req.params;
-    const result = await db.query(`
+    const { schema, table } = req.query;
+
+    const schemaResult = await db.query(`
       SELECT column_name, data_type
       FROM information_schema.columns
-      WHERE table_name = $1
-    `, [tableName]);
-    res.json(result.rows);
+      WHERE table_schema = $1 AND table_name = $2
+    `, [schema, table]);
+
+    const dataResult = await db.query(`SELECT * FROM "${schema}"."${table}"`);
+
+    res.json({
+      schema: schemaResult.rows,
+      data: dataResult.rows,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-router.get('/tables/:tableName/data', async (req, res) => {
+router.get('/visualize', async (req, res) => {
   try {
-    const { tableName } = req.params;
-    const result = await db.query(`SELECT * FROM ${tableName}`);
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.get('/tables/:tableName/visualize', async (req, res) => {
-  try {
-    const { tableName } = req.params;
-    const result = await db.query(`SELECT * FROM ${tableName}`);
+    const { schema, table } = req.query;
+    const result = await db.query(`SELECT * FROM "${schema}"."${table}"`);
     const data = result.rows;
 
     const embeddings = data.map(row => {

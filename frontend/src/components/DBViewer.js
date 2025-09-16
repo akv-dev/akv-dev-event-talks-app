@@ -12,30 +12,26 @@ const DBViewer = () => {
     fetch('http://localhost:3001/api/tables')
       .then(res => res.json())
       .then(data => {
-        console.log('Fetched tables:', data);
         if (Array.isArray(data)) {
           setTables(data);
         } else {
-          console.error('Error: Fetched data is not an array.');
-          setTables([]); // Set to empty array to prevent crash
+          setTables([]);
         }
       })
       .catch(err => console.error('Error fetching tables:', err));
   }, []);
 
-  const handleTableSelect = (tableName) => {
-    setSelectedTable(tableName);
+  const handleTableSelect = (table) => {
+    setSelectedTable(table);
     setVisualize(false);
 
-    fetch(`http://localhost:3001/api/tables/${tableName}/schema`)
+    fetch(`http://localhost:3001/api/table-details?schema=${table.schema}&table=${table.name}`)
       .then(res => res.json())
-      .then(data => setSchema(data))
-      .catch(err => console.error(`Error fetching schema for ${tableName}:`, err));
-
-    fetch(`http://localhost:3001/api/tables/${tableName}/data`)
-      .then(res => res.json())
-      .then(data => setData(data))
-      .catch(err => console.error(`Error fetching data for ${tableName}:`, err));
+      .then(details => {
+        setSchema(details.schema);
+        setData(details.data);
+      })
+      .catch(err => console.error(`Error fetching details for ${table.name}:`, err));
   };
 
   const handleVisualize = () => {
@@ -49,20 +45,20 @@ const DBViewer = () => {
         <h3>Tables</h3>
         <ul>
           {tables.map(table => (
-            <li key={table} onClick={() => handleTableSelect(table)}>
-              {table}
+            <li key={`${table.schema}.${table.name}`} onClick={() => handleTableSelect(table)}>
+              {`${table.schema}.${table.name}`}
             </li>
           ))}
         </ul>
       </div>
       {selectedTable && (
         <div>
-          <h3>{selectedTable}</h3>
+          <h3>{`${selectedTable.schema}.${selectedTable.name}`}</h3>
           {schema.find(col => col.column_name === 'embedding') && (
             <button onClick={handleVisualize}>Visualize Embeddings</button>
           )}
           {visualize ? (
-            <EmbeddingVisualizer table={selectedTable} />
+            <EmbeddingVisualizer schema={selectedTable.schema} table={selectedTable.name} />
           ) : (
             <table>
               <thead>
