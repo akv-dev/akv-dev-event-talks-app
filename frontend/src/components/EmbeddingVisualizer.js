@@ -4,18 +4,18 @@ import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Lege
 
 ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-const EmbeddingVisualizer = ({ schema, table }) => {
+const EmbeddingVisualizer = ({ schema, table, column }) => {
   const [visualizationData, setVisualizationData] = useState(null);
 
   useEffect(() => {
-    if (schema && table) {
-      fetch(`http://localhost:3001/api/visualize?schema=${schema}&table=${table}`)
+    if (schema && table && column) {
+      fetch(`http://localhost:3001/api/visualize?schema=${schema}&table=${table}&column=${column}`)
         .then(res => res.json())
         .then(data => {
             const chartData = {
                 datasets: [
                   {
-                    label: `${schema}.${table} Embeddings`,
+                    label: `${schema}.${table}.${column} Embeddings`,
                     data: data.map(item => ({ x: item.embedding_2d[0], y: item.embedding_2d[1] })),
                     backgroundColor: 'rgba(255, 99, 132, 0.5)',
                   },
@@ -25,7 +25,7 @@ const EmbeddingVisualizer = ({ schema, table }) => {
         })
         .catch(err => console.error(`Error fetching visualization data for ${table}:`, err));
     }
-  }, [schema, table]);
+  }, [schema, table, column]);
 
   return (
     <div>

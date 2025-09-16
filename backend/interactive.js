@@ -41,15 +41,15 @@ router.get('/table-details', async (req, res) => {
 
 router.get('/visualize', async (req, res) => {
   try {
-    const { schema, table } = req.query;
+    const { schema, table, column } = req.query;
     const result = await db.query(`SELECT * FROM "${schema}"."${table}"`);
     const data = result.rows;
 
     const embeddings = data.map(row => {
-        if (typeof row.embedding === 'string') {
-            return JSON.parse(row.embedding);
+        if (typeof row[column] === 'string') {
+            return JSON.parse(row[column]);
         }
-        return row.embedding;
+        return row[column];
     });
 
     if (embeddings.some(e => e === null || e === undefined)) {

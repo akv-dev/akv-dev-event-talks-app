@@ -64,6 +64,9 @@ function App() {
       {view === 'graph' ? (
         <div>
           <h1>Vector Embedding Visualization</h1>
+          <p>
+            This tool visualizes vector embeddings from a database. The graph view shows the relationships between different data points based on their vector similarity. The DB viewer allows you to explore the raw data and visualize high-dimensional vector embeddings in a 2D space using Principal Component Analysis (PCA).
+          </p>
           <input
             type="text"
             placeholder="Search nodes..."

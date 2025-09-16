@@ -7,6 +7,8 @@ const DBViewer = () => {
   const [schema, setSchema] = useState([]);
   const [data, setData] = useState([]);
   const [visualize, setVisualize] = useState(false);
+  const [vectorColumns, setVectorColumns] = useState([]);
+  const [selectedVectorColumn, setSelectedVectorColumn] = useState(null);
 
   useEffect(() => {
     fetch('http://localhost:3001/api/tables')
@@ -24,12 +26,16 @@ const DBViewer = () => {
   const handleTableSelect = (table) => {
     setSelectedTable(table);
     setVisualize(false);
+    setSelectedVectorColumn(null);
+    setVectorColumns([]);
 
     fetch(`http://localhost:3001/api/table-details?schema=${table.schema}&table=${table.name}`)
       .then(res => res.json())
       .then(details => {
         setSchema(details.schema);
         setData(details.data);
+        const vecCols = details.schema.filter(col => col.data_type === 'vector');
+        setVectorColumns(vecCols);
       })
       .catch(err => console.error(`Error fetching details for ${table.name}:`, err));
   };
@@ -54,11 +60,19 @@ const DBViewer = () => {
       {selectedTable && (
         <div>
           <h3>{`${selectedTable.schema}.${selectedTable.name}`}</h3>
-          {schema.find(col => col.column_name === 'embedding') && (
-            <button onClick={handleVisualize}>Visualize Embeddings</button>
+          {vectorColumns.length > 0 && (
+            <div>
+              <select onChange={(e) => setSelectedVectorColumn(e.target.value)} value={selectedVectorColumn || ''}>
+                <option value="" disabled>Select a vector column</option>
+                {vectorColumns.map(col => (
+                  <option key={col.column_name} value={col.column_name}>{col.column_name}</option>
+                ))}
+              </select>
+              <button onClick={handleVisualize} disabled={!selectedVectorColumn}>Visualize Embeddings</button>
+            </div>
           )}
           {visualize ? (
-            <EmbeddingVisualizer schema={selectedTable.schema} table={selectedTable.name} />
+            <EmbeddingVisualizer schema={selectedTable.schema} table={selectedTable.name} column={selectedVectorColumn} />
           ) : (
             <table>
               <thead>
