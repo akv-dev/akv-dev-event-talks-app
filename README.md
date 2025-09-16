@@ -18,7 +18,6 @@ These instructions will get you a copy of the project up and running on your loc
 
 *   [Node.js](https://nodejs.org/)
 *   [Podman](https://podman.io/)
-*   [Podman Compose](https://github.com/containers/podman-compose)
 
 ### Easy Setup with `gini.sh`
 
@@ -40,11 +39,11 @@ If you prefer to set up the project manually, follow these steps:
 
 2.  **Start the database:**
     ```bash
-    podman-compose up -d db
+    podman run -d --name postgres -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_PASSWORD=postgres -e POSTGRESQL_DATABASE=postgres -p 5432:5432 docker.io/bitnami/postgresql:latest
     ```
 
 3.  **Populate the database:**
-    Connect to the database using a PostgreSQL client (e.g., `psql` or a GUI tool). The credentials are in the `docker-compose.yml` file.
+    Connect to the database using a PostgreSQL client (e.g., `psql` or a GUI tool). The credentials are provided in the `podman run` command.
     ```sql
     CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -67,7 +66,7 @@ If you prefer to set up the project manually, follow these steps:
     ```bash
     cd backend
     npm install
-    # Create a .env file with the database credentials (see .env.example)
+    # Create a .env file with the database credentials
     node server.js &
     ```
 

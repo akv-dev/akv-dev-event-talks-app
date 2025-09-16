@@ -11,7 +11,7 @@ _GREEN='\033[0;32m'
 _NC='\033[0m' # No Color
 
 printf "${_BLUE}Starting the database...${_NC}\n"
-podman-compose up -d db
+podman run -d --name postgres -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_PASSWORD=postgres -e POSTGRESQL_DATABASE=postgres -p 5432:5432 docker.io/bitnami/postgresql:latest
 
 # 2. Wait for the database to be ready
 printf "${_BLUE}Waiting for the database to be ready...${_NC}\n"
@@ -19,7 +19,7 @@ sleep 10
 
 # 3. Populate the database
 printf "${_BLUE}Populating the database...${_NC}\n"
-cat <<EOF | podman exec -i vector-display_db_1 psql -U postgres
+cat <<EOF | podman exec -i postgres psql -U postgres
 CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE embeddings (
