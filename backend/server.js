@@ -8,6 +8,9 @@ const port = 3001;
 
 app.use(cors());
 
+const interactiveRouter = require('./interactive');
+app.use('/api', interactiveRouter);
+
 app.get('/api/vectors', async (req, res) => {
   try {
     const { metric } = req.query;
