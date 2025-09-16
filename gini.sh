@@ -12,12 +12,14 @@ _NC='\033[0m' # No Color
 
 printf "${_BLUE}Starting the database...${_NC}"
 
-if command -v podman &> /dev/null; then
+if command -v podman &> /dev/null && podman info &> /dev/null;
+then
     CONTAINER_CMD="podman"
-elif command -v docker &> /dev/null; then
+elif command -v docker &> /dev/null && docker info &> /dev/null;
+then
     CONTAINER_CMD="docker"
 else
-    printf "Error: Neither podman nor docker found. Please install one of them.\n"
+    printf "Error: Neither podman nor docker is running. Please start one of them.\n"
     exit 1
 fi
 
