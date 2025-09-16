@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_USER=postgres
+      - DB_HOST=db
+      - DB_DATABASE=postgres
+      - DB_PASSWORD=postgres
+      - DB_PORT=5432
+    depends_on:
+      - db
+  db:
+    image: pgvector/pgvector:pg17-trixie
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

@@ -78,3 +78,10 @@ You need to have PostgreSQL installed with the `pgvector` extension.
 ## How it works
 
 The frontend fetches the vector embeddings from the backend. For each vector, it also fetches the closest matching vector from the database. The vectors are then displayed as a graph, where each vector is a node, and a line connects it to its closest match.
+
+## Testing with Docker
+
+To be able to test the project, you can use the following docker image:
+```bash
+docker pull pgvector/pgvector:pg17-trixie
+```
