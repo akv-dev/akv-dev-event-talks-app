@@ -40,7 +40,7 @@ function App() {
 
   const filteredLinks = data.links.filter(link => {
     const sourceNode = data.nodes.find(node => node.id === link.source);
-    const targetNode = a.nodes.find(node => node.id === link.target);
+    const targetNode = data.nodes.find(node => node.id === link.target);
     return sourceNode && targetNode &&
            (sourceNode.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             targetNode.name.toLowerCase().includes(searchTerm.toLowerCase()));

@@ -39,18 +39,28 @@ INSERT INTO embeddings (text, embedding) VALUES
 EOF
 unset PGPASSWORD
 
-# 4. Install backend dependencies
+# 4. Create .env file for backend
+printf "${_BLUE}Creating .env file for backend...${_NC}\n"
+cat <<EOF > backend/.env
+DB_USER=postgres
+DB_HOST=localhost
+DB_DATABASE=postgres
+DB_PASSWORD=postgres
+DB_PORT=5432
+EOF
+
+# 5. Install backend dependencies
 printf "${_BLUE}Installing backend dependencies...${_NC}\n"
 (cd backend && npm install)
 
-# 5. Start the backend server
+# 6. Start the backend server
 printf "${_BLUE}Starting the backend server...${_NC}\n"
 (cd backend && node server.js &)
 
-# 6. Install frontend dependencies
+# 7. Install frontend dependencies
 printf "${_BLUE}Installing frontend dependencies...${_NC}\n"
 (cd frontend && npm install)
 
-# 7. Start the frontend application
+# 8. Start the frontend application
 printf "${_GREEN}Starting the frontend application...${_NC}\n"
 (cd frontend && npm start)
