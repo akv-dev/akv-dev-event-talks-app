@@ -6,11 +6,16 @@ This project allows you to visualize vector embeddings from a PostgreSQL databas
 
 ### 1. Database Setup
 
-You need to have PostgreSQL installed with the `pgvector` extension.
+This project uses Docker to run a PostgreSQL database with the `pgvector` extension. 
 
-1.  **Install `pgvector`:** Follow the instructions at [https://github.com/pgvector/pgvector](https://github.com/pgvector/pgvector).
+1.  **Start the database container:**
+    ```bash
+    docker-compose up -d db
+    ```
 
-2.  **Create the table and insert data:** Connect to your PostgreSQL database and run the following SQL commands:
+2.  **Connect to the database and create the table:**
+    You can connect to the database using any PostgreSQL client. The credentials are in the `docker-compose.yml` file.
+    Once connected, run the following SQL commands:
 
     ```sql
     CREATE EXTENSION IF NOT EXISTS vector;
@@ -44,11 +49,11 @@ You need to have PostgreSQL installed with the `pgvector` extension.
 
 3.  **Set up environment variables:** Create a `.env` file in the `backend` directory with your PostgreSQL connection details:
     ```
-    DB_USER=your_postgres_user
-    DB_HOST=your_postgres_host
-    DB_DATABASE=your_postgres_database
-    DB_PASSWORD=your_postgres_password
-    DB_PORT=your_postgres_port
+    DB_USER=postgres
+    DB_HOST=localhost
+    DB_DATABASE=postgres
+    DB_PASSWORD=postgres
+    DB_PORT=5432
     ```
 
 4.  **Start the backend server:**
@@ -78,10 +83,3 @@ You need to have PostgreSQL installed with the `pgvector` extension.
 ## How it works
 
 The frontend fetches the vector embeddings from the backend. For each vector, it also fetches the closest matching vector from the database. The vectors are then displayed as a graph, where each vector is a node, and a line connects it to its closest match.
-
-## Testing with Docker
-
-To be able to test the project, you can use the following docker image:
-```bash
-docker pull pgvector/pgvector:pg17-trixie
-```
